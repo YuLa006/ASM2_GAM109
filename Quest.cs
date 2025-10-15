@@ -13,8 +13,8 @@ namespace ASM1
         public string Description;
         public string QuesType;
         public string difficulty;
-        public string experienceReward;
-        public string GoldReward;
+        public int experienceReward;
+        public int GoldReward;
         public string status;
         public string requiredItemID;
         public string rewardItemID;

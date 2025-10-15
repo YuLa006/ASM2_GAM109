@@ -44,8 +44,8 @@ namespace ASM1
                         Username = part[1],
                         Email = part[2],
                         PasswordHash = part[3],
-                        RegistrationDate = part[4],
-                        LastLogin = part[5]
+                        RegistrationDate = DateTime.Parse(part[4]),
+                        LastLogin = DateTime.Parse(part[5])
                     };
                     acc.Add(act);
                 }
@@ -70,7 +70,7 @@ namespace ASM1
                         health =  Convert.ToInt32(p[5]),
                         mana = Convert.ToInt32(p[6]),
                         Class = p[7],
-                        creationDate = p[8],   
+                        creationDate = DateTime.Parse(p[8]),   
                     };
                     pl.Add(plr);
                 }
@@ -90,9 +90,9 @@ namespace ASM1
                         itemName = part[1],
                         itemType = part[2],
                         description = part[3],
-                        attackPower = part[4],
-                        defensePower = part[5],
-                        vaule = part[6],
+                        attackPower = int.Parse(part[4]),
+                        defensePower = int.Parse(part[5]),
+                        vaule = int.Parse(part[6]),
                         rarity = part[7],
                         ownerPlayerID = part[8],
                     };
@@ -115,8 +115,8 @@ namespace ASM1
                             Description = part[2],
                             QuesType = part[3],
                             difficulty = part[4],
-                            experienceReward = part[5],
-                            GoldReward = part[6],
+                            experienceReward = int.Parse(part[5]),
+                            GoldReward = int.Parse(part[6]),
                             status = part[7],
                             requiredItemID = part[8],
                             rewardItemID = part[9],
@@ -128,13 +128,28 @@ namespace ASM1
 
             // in ra thông tin
             Console.WriteLine("------------Account-----------");
-            foreach (var a in acc) Console.WriteLine(a);
+            foreach (var a in acc)
+            {
+                Console.WriteLine(a);
+            }
+
             Console.WriteLine("\n------------Player-----------");
-            foreach (var p in pl ) Console.WriteLine(p);
+            foreach (var p in pl)
+            {
+                Console.WriteLine(p);
+            }
+
             Console.WriteLine("\n------------Item-----------");
-            foreach(var i in items) Console.WriteLine(i);
+            foreach (var i in items)
+            {
+                Console.WriteLine(i);
+            }
+
             Console.WriteLine("\n------------Quest-----------");
-            foreach(var q in quests ) Console.WriteLine(q);
+            foreach (var q in quests)
+            {
+                Console.WriteLine(q);
+            }
 
             while (true)
             {

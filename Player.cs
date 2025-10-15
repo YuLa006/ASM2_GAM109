@@ -16,12 +16,12 @@ namespace ASM1
         public int health;
         public int mana;
         public string Class;
-        public string creationDate;
+        public DateTime creationDate;
 
         public override string ToString()
         {
             return $"PlayerID: {playerID} AccountID: {accountID} PlayerName: {playerName} Level: {Level}" +
-                $" Experience: {Experience} Health: {health} Mana: {mana} Class: {Class} CreationDate: {creationDate}";
+                $" Experience: {Experience} Health: {health} Mana: {mana} Class: {Class} CreationDate: {creationDate.ToString("yyyy-MM-dd")}";
         }
 
 

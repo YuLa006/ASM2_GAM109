@@ -12,13 +12,13 @@ namespace ASM1
         public string Username;
         public string PasswordHash;
         public string Email;
-        public string RegistrationDate;
-        public string LastLogin;
+        public DateTime RegistrationDate;
+        public DateTime LastLogin;
 
         public override string ToString()
         {
             return $"AccountID: {AccountID} Username: {Username}  Email: {Email}  PasswordHash: " +
-                $"{PasswordHash}  RegistrationDate:{RegistrationDate}  LastLogin: {LastLogin}";
+                $"{PasswordHash}  RegistrationDate:{RegistrationDate.ToString("yyyy-MM-dd")}  LastLogin: {LastLogin.ToString("yyyy-MM-dd")}";
         }
 
     }
