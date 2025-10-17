@@ -8,22 +8,22 @@ namespace ASM1
 {
     internal class Quest
     {
-        public string QuestID;
-        public string QuestName;
-        public string Description;
-        public string QuesType;
+        public string questID;
+        public string questName;
+        public string description;
+        public string quesType;
         public string difficulty;
         public int experienceReward;
-        public int GoldReward;
+        public int goldReward;
         public string status;
         public string requiredItemID;
         public string rewardItemID;
-        public string AssigneePlayerID;
+        public string assigneePlayerID;
 
         public override string ToString()
         {
-            return $"QuestID:{QuestID} QuestName:{QuestName} Description:{Description} QuestType:{QuesType} Difficulty:{difficulty} ExperienceReward:{experienceReward}" +
-                $" GoldReward:{GoldReward} Status:{status} RequiredItemID:{requiredItemID} RewardItemID:{rewardItemID} AssigneePlayerID:{AssigneePlayerID}";
+            return $"QuestID:{questID} QuestName:{questName} Description:{description} QuestType:{quesType} Difficulty:{difficulty} ExperienceReward:{experienceReward}" +
+                $" GoldReward:{goldReward} Status:{status} RequiredItemID:{requiredItemID} RewardItemID:{rewardItemID} AssigneePlayerID:{assigneePlayerID}";
         }
     }
 }

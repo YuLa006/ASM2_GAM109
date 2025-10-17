@@ -110,17 +110,17 @@ namespace ASM1
                     {
                         Quest qst = new Quest()
                         {
-                            QuestID = part[0],
-                            QuestName = part[1],
-                            Description = part[2],
-                            QuesType = part[3],
+                            questID = part[0],
+                            questName = part[1],
+                            description = part[2],
+                            quesType = part[3],
                             difficulty = part[4],
                             experienceReward = int.Parse(part[5]),
-                            GoldReward = int.Parse(part[6]),
+                            goldReward = int.Parse(part[6]),
                             status = part[7],
                             requiredItemID = part[8],
                             rewardItemID = part[9],
-                            AssigneePlayerID = part[10],
+                            assigneePlayerID = part[10],
                         };
                         quests.Add(qst);                    
                 }
@@ -177,7 +177,7 @@ namespace ASM1
 
                 Console.Write("\nMời bạn chọn 1 mục: ");
                 int chon = Convert.ToInt32(Console.ReadLine());
-               
+
                 switch (chon)
                 {
                     case 1:
@@ -188,51 +188,93 @@ namespace ASM1
                             Console.WriteLine(p);
                         }
                         break;
+
                     case 2:
                         Console.WriteLine("Câu 2:Đếm số lượng vật phẩm (Item) có Rarity là Legendary.");
                         var cau2 = items.Count(i => i.rarity == "Legendary");
                         Console.WriteLine($"Số lượng vật phẩm có Rarity là Legendary: {cau2}");
                         break;
+
                     case 3:
                         Console.WriteLine("Câu 3:Tìm thông tin người chơi (Player) đầu tiên trong danh sách có Class là Mage. Nếu không có, trả về null.");
-                        var cau3 = pl.FirstOrDefault( p => p.Class == "Mage");
-                        Console.WriteLine(cau3?.ToString() ?? "Null");                       
+                        var cau3 = pl.FirstOrDefault(p => p.Class == "Mage");
+                        Console.WriteLine(cau3?.ToString() ?? "Null");
                         break;
+
                     case 4:
                         Console.WriteLine("Câu 4:Liệt kê tên tất cả các nhiệm vụ (QuestName) theo thứ tự bảng chữ cái giảm dần.");
-                        var cau4 = quests.OrderByDescending(q => q.QuestName).Select(q => q.QuestName);
-                        foreach(var q in cau4)
+                        var cau4 = quests.OrderByDescending(q => q.questName).Select(q => q.questName);
+                        foreach (var q in cau4)
                         {
                             Console.WriteLine(q);
-                        }    
+                        }
                         break;
+
                     case 5:
                         Console.WriteLine("Câu 5:Kiểm tra xem có bất kỳ tài khoản (Account) nào được đăng ký (RegistrationDate) trong năm 2023 không.");
                         var cau5 = acc.Any(a => a.RegistrationDate.Year == 2023);
                         Console.WriteLine(cau5);
                         break;
+
                     case 6:
                         Console.WriteLine("Câu 6:Lấy thông tin người chơi (Player) cuối cùng trong danh sách players (dựa trên thứ tự hiện tại trong list.");
-                        var cau6 = pl.LastOrDefault();
+                        var cau6 = pl.OrderBy(p => p.creationDate).LastOrDefault();
                         Console.WriteLine(cau6.ToString());
                         break;
+
                     case 7:
                         Console.WriteLine("Câu 7:Tạo một Dictionary<string, string> trong đó key là AccountID và value là Username của tài khoản.");
                         var cau7 = acc.ToDictionary(a => a.AccountID, b => b.Username);
                         foreach (var a in cau7)
                         {
-                            Console.WriteLine(a.ToString());
-                        }    
+                            Console.WriteLine(a.Key + "\t" + a.Value);
+                        }
                         break;
-                    case 8:
-                        Console.WriteLine("Câu 8:Liệt kê tên của tất cả các vật phẩm (ItemName) mà người chơi có PlayerName là Aragorn đang sở hữu.");
 
+                    case 8:
+                        Console.WriteLine("Câu 8:Liệt kê tên của tất cả các vật phẩm (ItemName) mà người chơi có PlayerName là Aragorn đang sở hữu.");                        
+                        var cau8 = pl.Where(p => p.playerName == "Aragorn")
+                            .GroupJoin(items, 
+                            p => p.playerID,
+                            i => i.ownerPlayerID,
+                            (p, ItemGroup) => new {
+                                Playername = p.playerName,
+                                Items = ItemGroup
+                            });
+                        foreach (var a in cau8)
+                        {
+                            Console.WriteLine($"{a.Playername}: ");
+                            foreach( var b in a.Items)
+                            {
+                                Console.WriteLine($"{b.itemName}");
+                            }
+                        }
                         break;
+
                     case 9:
                         Console.WriteLine("Câu 9:Lấy danh sách tất cả các ItemType của vật phẩm (Item) mà không bị trùng lặp, sắp xếp theo bảng chữ cái.");
+                        var cau9 = items.Select(p => p.itemType).Distinct().OrderBy(p => p);
+                        foreach (var a in cau9)
+                        {
+                            Console.WriteLine(a);
+                        }
                         break;
                     case 10:
                         Console.WriteLine("Câu 10:Hiển thị PlayerName và QuestName của tất cả các nhiệm vụ đang có trạng thái InProgress. Kết quả là một danh sách các đối tượng ẩn danh hoặc một class tùy chỉnh.");
+                        var cau10 = quests.Where(q => q.status == "InProgress")
+                            .Join(pl,                            
+                            qs => qs.assigneePlayerID,
+                            p => p.playerID,
+                            (qs,p) => new
+                            {
+                                PlayerName = p.playerName,
+                                QuestName = qs.questName,
+                            });
+                        foreach (var a in cau10)
+                        {
+                            Console.WriteLine($"PlayerName: {a.PlayerName}\t QuestName: {a.QuestName}");
+                        }
+
                         break;
                     case 11:
                         Console.WriteLine("Câu 11:Tạo một ILookup<string, Player> nhóm tất cả người chơi theo Class của họ.");
