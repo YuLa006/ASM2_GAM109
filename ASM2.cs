@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -154,7 +156,7 @@ namespace ASM1
             while (true)
             {
                 Console.WriteLine("\n----------------------------------------Mục lục---------------------------------------------------------------");
-                Console.WriteLine("Câu 1:Liệt kê tất cả tên người chơi (PlayerName) có Level lớn hơn 55.");                
+                Console.WriteLine("Câu 1:Liệt kê tất cả tên người chơi (PlayerName) có Level lớn hơn 55.");
                 Console.WriteLine("Câu 2:Đếm số lượng vật phẩm (Item) có Rarity là Legendary.");
                 Console.WriteLine("Câu 3:Tìm thông tin người chơi (Player) đầu tiên trong danh sách có Class là Mage. Nếu không có, trả về null.");
                 Console.WriteLine("Câu 4:Liệt kê tên tất cả các nhiệm vụ (QuestName) theo thứ tự bảng chữ cái giảm dần.");
@@ -232,9 +234,8 @@ namespace ASM1
                         break;
 
                     case 8:
-                        Console.WriteLine("Câu 8:Liệt kê tên của tất cả các vật phẩm (ItemName) mà người chơi có PlayerName là Aragorn đang sở hữu.");                        
-                        var cau8 = pl.Where(p => p.playerName == "Aragorn")
-                            .GroupJoin(items, 
+                        Console.WriteLine("Câu 8:Liệt kê tên của tất cả các vật phẩm (ItemName) mà người chơi có PlayerName là Aragorn đang sở hữu.");
+                        var cau8 = pl.Where(p => p.playerName == "Aragorn").GroupJoin(items,
                             p => p.playerID,
                             i => i.ownerPlayerID,
                             (p, ItemGroup) => new {
@@ -244,7 +245,7 @@ namespace ASM1
                         foreach (var a in cau8)
                         {
                             Console.WriteLine($"{a.Playername}: ");
-                            foreach( var b in a.Items)
+                            foreach (var b in a.Items)
                             {
                                 Console.WriteLine($"{b.itemName}");
                             }
@@ -261,11 +262,10 @@ namespace ASM1
                         break;
                     case 10:
                         Console.WriteLine("Câu 10:Hiển thị PlayerName và QuestName của tất cả các nhiệm vụ đang có trạng thái InProgress. Kết quả là một danh sách các đối tượng ẩn danh hoặc một class tùy chỉnh.");
-                        var cau10 = quests.Where(q => q.status == "InProgress")
-                            .Join(pl,                            
+                        var cau10 = quests.Where(q => q.status == "InProgress").Join(pl,
                             qs => qs.assigneePlayerID,
                             p => p.playerID,
-                            (qs,p) => new
+                            (qs, p) => new
                             {
                                 PlayerName = p.playerName,
                                 QuestName = qs.questName,
@@ -278,21 +278,102 @@ namespace ASM1
                         break;
                     case 11:
                         Console.WriteLine("Câu 11:Tạo một ILookup<string, Player> nhóm tất cả người chơi theo Class của họ.");
+                        ILookup<string, Player> lookup = pl.ToLookup(p => p.Class);
+                        foreach (var item in lookup)
+                        {
+                            Console.WriteLine(item.Key);
+                            foreach (var x in item)
+                            {
+                                Console.WriteLine(x.ToString());
+                            }
+                        }
                         break;
                     case 12:
                         Console.WriteLine("Câu 12:Đếm số lượng vật phẩm (Item) mà mỗi ItemType có. Hiển thị ItemType và số lượng.");
+                        var cau12 = items.ToLookup(i => i.itemType);
+                        foreach (var item in cau12)
+                        {
+                            Console.WriteLine("ItemType: " + item.Key + " " + item.Count());
+                        }
                         break;
                     case 13:
                         Console.WriteLine("Câu 13:Liệt kê tất cả PlayerName của những người chơi đang thực hiện ít nhất một nhiệm vụ (Quest) có Difficulty là Hard. Đảm bảo tên người chơi không bị trùng lặp.");
+                        var cau13 = quests.Where(q => q.difficulty == "Hard").Select(q => q.assigneePlayerID).Distinct().Join(pl,
+                            qs => qs,
+                            p => p.playerID,
+                            (qs, p) => new
+                            {
+                                PlayerName = p.playerName,
+                                a = qs
+                            });
+                        foreach (var item in cau13)
+                        {
+                            Console.WriteLine(item.PlayerName);
+                        }
                         break;
+
                     case 14:
                         Console.WriteLine("Câu 14:Tìm tất cả các người chơi (Player) không được giao bất kỳ nhiệm vụ (Quest) nào. ");
+                        var cau14 = pl.Select(p => p.playerID).Except(quests.Select(q => q.assigneePlayerID));
+                        var Info = pl.Where(p => cau14.Contains(p.playerID));
+                        foreach (var item in Info)
+                        {
+                            Console.WriteLine(item.playerName);
+                        }
                         break;
+
                     case 15:
                         Console.WriteLine("Câu 15:Liệt kê tên người chơi (PlayerName) và tổng ExperienceReward từ tất cả các nhiệm vụ (Quest) mà mỗi người chơi đã hoàn thành (Status == Completed). Chỉ hiển thị những người chơi có tổng ExperienceReward lớn hơn 100000. Sắp xếp kết quả theo tổng ExperienceReward giảm dần.");
-                        break;
+                        var cau15 = quests.Where(q => q.status == "Completed").Select(p => p)
+                            .ToLookup(q => q.assigneePlayerID)
+                            .Select(c => new
+                            {
+                                SumGroup = c.Sum(p => p.experienceReward),
+                                PlayerID = c.Key
+                            });
+                        var Compare = cau15.Where(g => g.SumGroup > 100000);
+                        var PlayerGroup = pl.Join(Compare,
+                            p => p.playerID,
+                            c => c.PlayerID,
+                            (p, c) => new
+                            {
+                                ExpSum = c.SumGroup,
+                                PlayerName = p.playerName,
+                            }).OrderByDescending(p => p.ExpSum);
+                        if (PlayerGroup != null && PlayerGroup.Any())
+                        {
+                            foreach (var i in Compare)
+                            {
+                                Console.WriteLine(i);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Không có giá trị nào thỏa mãn điều kiện");
+                        }
+                            break;
+
                     case 16:
                         Console.WriteLine("Câu 16:Đối với mỗi Account, hãy liệt kê Username của tài khoản và danh sách tên các nhân vật (PlayerName) thuộc tài khoản đó, nhưng chỉ những nhân vật có Level từ 30 trở lên. ");
+                        var cau16 = pl.Where(p => p.Level >= 30)
+                            .ToLookup(p => p.accountID);
+                        var Group = pl.Join(acc,
+                            p => p.accountID,
+                            a => a.AccountID,
+                            (p, a) => new
+                            {
+                                a.AccountID,
+                                a.Username,
+                                p.playerName,
+                                p.Level,
+                            })
+                            .Where(p => p.Level >= 30)
+                            .ToLookup(p => p.AccountID);
+                        foreach(var g in Group)
+                        {
+                            Console.WriteLine(g);
+                        }
+
                         break;
                     case 17:
                         Console.WriteLine("Câu 17:(Sử dụng SelectMany) Tìm tất cả các cặp vật phẩm (Item) mà một người chơi (Player) có thể trang bị, trong đó một vật phẩm là Weapon (ví dụ ItemType chứa Sword, Axe, Bow, Staff, Dagger, Wand, Hammer) và vật phẩm kia là Armor hoặc Shield. Hiển thị PlayerName, tên vũ khí, và tên giáp/khiên.");
